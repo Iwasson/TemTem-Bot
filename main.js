@@ -2,6 +2,7 @@ const auth = require('./auth.json');
 const axios = require('axios');
 const fs = require('fs');
 const temList = require('./temtem.json');
+const conList = require('./conditions.json');
 const url = 'https://temtem-api.mael.tech/api/';
 
 
@@ -9,7 +10,7 @@ const url = 'https://temtem-api.mael.tech/api/';
 function menu(input) {
   let command = input.split(" ");
   console.log('command: ' + command);
-  
+
   switch (command[0]) {
     /* with over 130 tems, will bomb stream chat */
     case "getTems":
@@ -21,14 +22,19 @@ function menu(input) {
     case "freeTem":
       freeTem(command[1], command[2]);
       break;
+    /* API IS BUSTED
     case "temRewards":
       temRewards();
       break;
+    */
     case "types":
       types();
       break;
-    case "conditions":
-      conditions();
+    case "updateCon":
+      updateConditions();
+      break;
+    case "con":
+      conditions(command[1]);
       break;
     case "techniques":
       techniques();
@@ -90,17 +96,17 @@ async function getAllTem() {
       response.data.forEach(tem => {
         names += "\"" + tem.name.toLowerCase() + "\"" + ":" + "\"" + tem.number + "\",";
       });
-      names = names.substring(0, names.length-1);
+      names = names.substring(0, names.length - 1);
       names += "}";
-      fs.writeFile("temtem.json", names, function (err){
-        if(err) { console.log(err) }
+      fs.writeFile("temtem.json", names, function (err) {
+        if (err) { console.log(err) }
       })
       console.log("List saved!");
     })
     .catch(function (error) {
       console.log(error);
     })
-    return;
+  return;
 }
 
 // '/api/temtems/[number]'
@@ -113,29 +119,72 @@ function getTemInfo(temName) {
     .catch(function (error) {
       console.log("could not find tem!");
     })
-    return;
+  return;
 }
 
 // '/api/freetem/[temtem]/[level]'
 async function freeTem(temName, level) {
-
+  axios.get(url + 'freetem/' + temName + "/" + level)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("Either the name or the level was not inputed correctly!");
+    })
+  return;
 }
 
 // '/api/freetem/rewards'
+/* DOES NOT WORK IN THE API
 async function temRewards() {
-
+  axios.get(url + 'freetem/rewards')
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find tem!");
+    })
+    return;
 }
+*/
 
 // '/api/types'
 async function types() {
-
+  axios.get(url + 'types/')
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find data!");
+    })
+  return;
 }
 
 // '/api/conditions'
-async function conditions() {
+async function updateConditions() {
+  let conditions = "{";
+  axios.get(url + 'conditions/')
+    .then(function (response) {
+      response.data.forEach(condition => {
+        conditions += "\"" + condition.name.toLowerCase() + "\"" + ":" + "\"" + condition.description + "\",";
+      });
+      conditions = conditions.substring(0, conditions.length - 1);
+      conditions += "}";
 
+      fs.writeFile("conditions.json", conditions, function (err) {
+        if (err) { console.log(err) }
+      })
+      console.log("List saved!");
+    })
+    .catch(function (error) {
+      console.log("could not find tem!");
+    })
+    return;
 }
 
+async function conditions(con){
+  console.log(conList[con]);
+}
 // '/api/techniques'
 async function techniques() {
 
@@ -168,7 +217,7 @@ async function quests() {
 
 // '/api/dojos'
 async function dojos() {
-  
+
 }
 
 // '/api/characters'
@@ -212,5 +261,9 @@ async function weakCalc() {
 }
 
 //menu("getTems");
-menu('getTem Oree');
+//menu('getTem Oree');
+//menu("freeTem oree 2");
+//menu("temRewards");
+//menu("types");
+menu("con alerted");
 //console.log(temList.oree);
