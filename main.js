@@ -3,6 +3,7 @@ const axios = require('axios');
 const fs = require('fs');
 const temList = require('./temtem.json');
 const conList = require('./conditions.json');
+const techList = require('./techniques.json');
 const url = 'https://temtem-api.mael.tech/api/';
 
 
@@ -36,8 +37,14 @@ function menu(input) {
     case "con":
       conditions(command[1]);
       break;
-    case "techniques":
-      techniques();
+    case "updateTech":
+      updateTechniques();
+      break;
+    case "tech":
+      let techs = command[1];
+      if(command[2]) {techs += " " + command[2]}
+      if(command[3]) {techs += " " + command[3]}
+      techniques(techs);
       break;
     case "courses":
       courses();
@@ -184,10 +191,35 @@ async function updateConditions() {
 
 async function conditions(con){
   console.log(conList[con]);
+  return;
 }
-// '/api/techniques'
-async function techniques() {
 
+// '/api/techniques'
+async function updateTechniques() {
+  let techniques = "{";
+  axios.get(url + 'techniques/')
+    .then(function (response) {
+      response.data.forEach(tech => {
+        techniques += "\"" + tech.name.toLowerCase() + "\"" + ":"  + JSON.stringify(tech) + ",";
+      });
+      techniques = techniques.substring(0, techniques.length - 1);
+      techniques += "}";
+
+      fs.writeFile("techniques.json", techniques, function (err) {
+        if (err) { console.log(err) }
+      })
+      console.log("List saved!");
+    })
+    .catch(function (error) {
+      console.log("could not find tem!");
+    })
+    return;
+}
+
+// '/api/techniques'
+async function techniques(tech) {
+  console.log(techList[tech]);
+  return;
 }
 
 // '/api/training-courses'
@@ -265,5 +297,6 @@ async function weakCalc() {
 //menu("freeTem oree 2");
 //menu("temRewards");
 //menu("types");
-menu("con alerted");
+//menu("con alerted");
+menu("tech acid reflux")
 //console.log(temList.oree);
