@@ -13,7 +13,6 @@ function menu(input) {
   console.log('command: ' + command);
 
   switch (command[0]) {
-    /* with over 130 tems, will bomb stream chat */
     case "getTems":
       getAllTem();
       break;
@@ -298,5 +297,5 @@ async function weakCalc() {
 //menu("temRewards");
 //menu("types");
 //menu("con alerted");
-menu("tech acid reflux")
+//menu("tech acid reflux")
 //console.log(temList.oree);
