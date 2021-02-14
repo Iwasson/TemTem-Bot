@@ -9,7 +9,11 @@ const client = new tmi.Client({
     secure: true,
     reconnect: true
   },
-  channels: [ 'channel_name' ]
+  identity: {
+    username: auth.username,
+    password: auth.oauth
+  },
+  channels: [auth.channels]
 });
 
 client.connect();
