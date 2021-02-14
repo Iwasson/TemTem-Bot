@@ -1,19 +1,45 @@
 const auth = require('./auth.json');
 const axios = require('axios');
-const fs = require('fs');
 const url = 'https://temtem-api.mael.tech/api/';
+
+const tmi = require('tmi.js');
+
+const client = new tmi.Client({
+  connection: {
+    secure: true,
+    reconnect: true
+  },
+  channels: [ 'channel_name' ]
+});
+
+client.connect();
+
+client.on('message', (channel, tags, message, self) => {
+  console.log(`${tags['display-name']}: ${message}`);
+});
+
+
+
 
 
 function menu(input) {
   let command = input.split(" ");
-  console.log('command: ' + command);
+  let args = [];
+  command.forEach(com => {
+    com = com.toLowerCase();
+    com = com.charAt(0).toUpperCase() + com.substring(1);
+    if (com == "Dna") com = "DNA";
+    args.push(com);
+  });
+  args[0] = args[0].toLowerCase();
+  console.log('command: ' + args);
 
-  switch (command[0]) {
+  switch (args[0]) {
     case "getTem":
-      getTemInfo(command[1]);
+      getTemInfo(args[1]);
       break;
     case "freeTem":
-      freeTem(command[1], command[2]);
+      freeTem(args[1], args[2]);
       break;
     /* API IS BUSTED
     case "temRewards":
@@ -24,53 +50,61 @@ function menu(input) {
       types();
       break;
     case "con":
-      conditions(command[1]);
+      conditions(args[1]);
       break;
     case "tech":
-      techniques(command.slice(1).join(' '));
+      techniques(args.slice(1).join(' '));
       break;
-    case "course":
-      courses(command[1]);
-      break;
+    /*
+  case "course":
+    courses(command[1]);
+    break;
+    */
     case "trait":
-      traits(command[1]);
+      traits(args[1]);
       break;
     case "item":
-      items(command.slice(1).join(' '));
+      items(args.slice(1).join(' '));
       break;
     case "gear":
-      gear(command.slice(1).join(' '));
+      gear(args.slice(1).join(' '));
       break;
-    case "quests":
-      quests();
+    case "quest":
+      quests(args.slice(1).join(' '));
       break;
-    case "dojos":
-      dojos();
+    case "dojo":
+      dojos(args.slice(1).join(' '));
       break;
+    /*
     case "characters":
       characters();
       break;
+    */
     case "saipark":
       saipark();
       break;
-    case "locations":
-      locations();
+    case "location":
+      locations(args.slice(1).join(' '));
       break;
-    case "cosmetics":
-      cosmetics();
+    case "cosmetic":
+      cosmetics(args.slice(1).join(' '));
       break;
+    /*
     case "dyes":
       dyes();
       break;
-    case "patches":
+    */
+    case "patch":
       patches();
       break;
-    case "weaknesses":
-      weaknesses();
+    case "weak":
+      weaknesses(args.slice(1).join(' '));
       break;
+    /*
     case "weakCalc":
       weakCalc();
       break;
+    */
     default:
       console.log("Please provide correct input");
       break;
@@ -79,6 +113,7 @@ function menu(input) {
 
 // '/api/temtems'
 //Admin command that updates a list of all tems.
+/*
 async function getAllTem() {
   axios.get(url + 'temtems')
     .then(function (response) {
@@ -98,6 +133,7 @@ async function getAllTem() {
     })
   return;
 }
+*/
 
 // '/api/temtems/[number]'
 function getTemInfo(temName) {
@@ -149,7 +185,7 @@ async function types() {
   return;
 }
 
-async function conditions(con){
+async function conditions(con) {
   axios.get(url + 'conditions?names=' + con)
     .then(function (response) {
       console.log(response.data);
@@ -172,97 +208,159 @@ async function techniques(tech) {
   return;
 }
 
+/*
 // '/api/training-courses'
 async function courses(course) {
-  console.log(courseList[course.toLowerCase()]);
+  axios.get(url + 'training-courses?number=' + course.toUpperCase())
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find tem!");
+    })
   return;
 }
+*/
 
 // '/api/traits'
 async function traits(trait) {
-  console.log(traitList[trait.toLowerCase()]);
+  axios.get(url + 'traits?names=' + trait)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find trait!");
+    })
   return;
 }
 
 // '/api/items'
 async function items(item) {
-  console.log(itemList[item]);
+  axios.get(url + 'items?names=' + item)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find item!");
+    })
   return;
 }
 
 // '/api/gear'
 async function gear(gear) {
-  console.log(gearList[gear.toLowerCase()]);
+  axios.get(url + 'gear?names=' + gear)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find gear!");
+    })
   return;
 }
 
 // '/api/quests'
 
 // '/api/quests'
-async function quests() {
-
+async function quests(quest) {
+  axios.get(url + 'quests?names=' + quest)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find quest!");
+    })
+  return;
 }
 
 // '/api/dojos'
-async function dojos() {
-
+async function dojos(dojo) {
+  axios.get(url + 'dojos?names=' + dojo)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find dojo!");
+    })
+  return;
 }
 
 // '/api/characters'
+/* can only provide wiki links, not worth it
 async function characters() {
 
 }
+*/
 
 // '/api/saipark'
 async function saipark() {
-
+  axios.get(url + 'saipark?limit=1')
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find saipark!");
+    })
+  return;
 }
 
 // '/api/locations'
-async function locations() {
-
+async function locations(location) {
+  axios.get(url + 'locations?names=' + location)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find location!");
+    })
+  return;
 }
 
 // '/api/cosmetics'
-async function cosmetics() {
-
+async function cosmetics(cosm) {
+  axios.get(url + 'cosmetics?names=' + cosm)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find cosmetic!");
+    })
+  return;
 }
 
 // '/api/dyes'
+/* not really worth implementing
 async function dyes() {
 
 }
+*/
 
 // '/api/patches'
 async function patches() {
-
+  axios.get(url + 'patches?limit=1')
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find patches!");
+    })
+  return;
 }
 
 // '/api/weaknesses'
-async function weaknesses() {
-
+async function weaknesses(weak) {
+  axios.get(url + 'weaknesses')
+    .then(function (response) {
+      console.log(response.data[weak]);
+    })
+    .catch(function (error) {
+      console.log("could not find patches!");
+    })
+  return;
 }
 
+/*
 // '/api/weaknesses/calculate'
 async function weakCalc() {
 
 }
-
-
-//menu("getTems");
-//menu('getTem Oree');
-//menu("freeTem oree 2");
-//menu("temRewards");
-//menu("types");
-//menu("con Alerted");
-menu("tech Acid Reflux")
-//menu("updateCourses");
-//menu("course tc001");
-//menu("updateTraits");
-//menu("trait Avenger");
-//menu("updateItems");
-//menu("item smoke bomb");
-//menu("updateGear");
-//menu("gear Aggressive DNA Strand");
-
-//console.log(temList.oree);
+*/
