@@ -1,11 +1,7 @@
 const auth = require('./auth.json');
 const axios = require('axios');
 const fs = require('fs');
-const temList = require('./temtem.json');
-const conList = require('./conditions.json');
-const techList = require('./techniques.json');
 const url = 'https://temtem-api.mael.tech/api/';
-
 
 
 function menu(input) {
@@ -13,9 +9,6 @@ function menu(input) {
   console.log('command: ' + command);
 
   switch (command[0]) {
-    case "getTems":
-      getAllTem();
-      break;
     case "getTem":
       getTemInfo(command[1]);
       break;
@@ -30,32 +23,23 @@ function menu(input) {
     case "types":
       types();
       break;
-    case "updateCon":
-      updateConditions();
-      break;
     case "con":
       conditions(command[1]);
       break;
-    case "updateTech":
-      updateTechniques();
-      break;
     case "tech":
-      let techs = command[1];
-      if(command[2]) {techs += " " + command[2]}
-      if(command[3]) {techs += " " + command[3]}
-      techniques(techs);
+      techniques(command.slice(1).join(' '));
       break;
-    case "courses":
-      courses();
+    case "course":
+      courses(command[1]);
       break;
-    case "traits":
-      traits();
+    case "trait":
+      traits(command[1]);
       break;
-    case "items":
-      items();
+    case "item":
+      items(command.slice(1).join(' '));
       break;
     case "gear":
-      gear();
+      gear(command.slice(1).join(' '));
       break;
     case "quests":
       quests();
@@ -104,7 +88,7 @@ async function getAllTem() {
       });
       names = names.substring(0, names.length - 1);
       names += "}";
-      fs.writeFile("temtem.json", names, function (err) {
+      fs.writeFile("lists/temtem.json", names, function (err) {
         if (err) { console.log(err) }
       })
       console.log("List saved!");
@@ -117,8 +101,7 @@ async function getAllTem() {
 
 // '/api/temtems/[number]'
 function getTemInfo(temName) {
-  let temNum = temList[temName.toLowerCase()];
-  axios.get(url + 'temtems/' + temNum)
+  axios.get(url + 'temtems?names=' + temName)
     .then(function (response) {
       console.log(response.data);
     })
@@ -166,80 +149,54 @@ async function types() {
   return;
 }
 
-// '/api/conditions'
-async function updateConditions() {
-  let conditions = "{";
-  axios.get(url + 'conditions/')
-    .then(function (response) {
-      response.data.forEach(condition => {
-        conditions += "\"" + condition.name.toLowerCase() + "\"" + ":" + "\"" + condition.description + "\",";
-      });
-      conditions = conditions.substring(0, conditions.length - 1);
-      conditions += "}";
-
-      fs.writeFile("conditions.json", conditions, function (err) {
-        if (err) { console.log(err) }
-      })
-      console.log("List saved!");
-    })
-    .catch(function (error) {
-      console.log("could not find tem!");
-    })
-    return;
-}
-
 async function conditions(con){
-  console.log(conList[con]);
-  return;
-}
-
-// '/api/techniques'
-async function updateTechniques() {
-  let techniques = "{";
-  axios.get(url + 'techniques/')
+  axios.get(url + 'conditions?names=' + con)
     .then(function (response) {
-      response.data.forEach(tech => {
-        techniques += "\"" + tech.name.toLowerCase() + "\"" + ":"  + JSON.stringify(tech) + ",";
-      });
-      techniques = techniques.substring(0, techniques.length - 1);
-      techniques += "}";
-
-      fs.writeFile("techniques.json", techniques, function (err) {
-        if (err) { console.log(err) }
-      })
-      console.log("List saved!");
+      console.log(response.data);
     })
     .catch(function (error) {
       console.log("could not find tem!");
     })
-    return;
+  return;
 }
 
 // '/api/techniques'
 async function techniques(tech) {
-  console.log(techList[tech]);
+  axios.get(url + 'techniques?names=' + tech)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log("could not find tem!");
+    })
   return;
 }
 
 // '/api/training-courses'
-async function courses() {
-
+async function courses(course) {
+  console.log(courseList[course.toLowerCase()]);
+  return;
 }
 
 // '/api/traits'
-async function traits() {
-
+async function traits(trait) {
+  console.log(traitList[trait.toLowerCase()]);
+  return;
 }
 
 // '/api/items'
-async function items() {
-
+async function items(item) {
+  console.log(itemList[item]);
+  return;
 }
 
 // '/api/gear'
-async function gear() {
-
+async function gear(gear) {
+  console.log(gearList[gear.toLowerCase()]);
+  return;
 }
+
+// '/api/quests'
 
 // '/api/quests'
 async function quests() {
@@ -291,11 +248,21 @@ async function weakCalc() {
 
 }
 
+
 //menu("getTems");
 //menu('getTem Oree');
 //menu("freeTem oree 2");
 //menu("temRewards");
 //menu("types");
-//menu("con alerted");
-//menu("tech acid reflux")
+//menu("con Alerted");
+menu("tech Acid Reflux")
+//menu("updateCourses");
+//menu("course tc001");
+//menu("updateTraits");
+//menu("trait Avenger");
+//menu("updateItems");
+//menu("item smoke bomb");
+//menu("updateGear");
+//menu("gear Aggressive DNA Strand");
+
 //console.log(temList.oree);
